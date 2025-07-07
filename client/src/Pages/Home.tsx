@@ -1,4 +1,3 @@
-import React from 'react';
 import { Flex, Layout } from 'antd';
 import { Body, Footer, Header } from '../Components';
 
@@ -12,14 +11,22 @@ const layoutStyle = {
   backgroundSize: 'cover',
 };
 
-const App: React.FC = () => (
-  <Flex gap="middle" wrap>
-    <Layout style={layoutStyle}>
-      <Header backgroundColor="transparent"/>
-      <Body />
-      <Footer backgroundColor='transparent'/>
-    </Layout>
-  </Flex>
-);
+export const Home = () => {
+  
+  return (
+    <>
+      <Flex gap="middle" wrap>
+        <Layout style={layoutStyle}>
+          <Header backgroundColor="transparent" />
+          <Body />
+          <Footer backgroundColor='transparent' />
+        </Layout>
+      </Flex>
+    </>
+  )
+}
 
-export default App;
+export default Home;
+
+
+

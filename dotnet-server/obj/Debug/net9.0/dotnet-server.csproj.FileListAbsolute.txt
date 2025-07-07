@@ -47,3 +47,4 @@ C:\programs\SilentShare\dotnet-server\obj\Debug\net9.0\refint\dotnet-server.dll
 C:\programs\SilentShare\dotnet-server\obj\Debug\net9.0\dotnet-server.pdb
 C:\programs\SilentShare\dotnet-server\obj\Debug\net9.0\dotnet-server.genruntimeconfig.cache
 C:\programs\SilentShare\dotnet-server\obj\Debug\net9.0\ref\dotnet-server.dll
+C:\programs\SilentShare\dotnet-server\obj\Debug\net9.0\dotnet-server.sourcelink.json

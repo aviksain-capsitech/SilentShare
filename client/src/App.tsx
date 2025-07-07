@@ -1,75 +1,8 @@
-import React from 'react';
-import type { FormProps } from 'antd';
-import { Button, Checkbox, Flex, Form, Input } from 'antd';
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router";
 
-type FieldType = {
-  username?: string;
-  password?: string;
-  remember?: string;
-};
+function App() {
+  return (
+    <div>App</div>
+  )
+}
 
-const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
-  console.log('Success:', values);
-};
-
-const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
-  console.log('Failed:', errorInfo);
-};
-
-const boxStyle: React.CSSProperties = {
-  borderRadius: 6,
-  border: '2px solid black',
-  paddingTop: 40,
-};
-
-
-const App: React.FC = () => (
-  <Flex style={boxStyle} justify='space-around' align='center'>
-    <Form
-      name="basic"
-      labelCol={{ span: 8 }}
-      wrapperCol={{ span: 16 }}
-      style={{ maxWidth: 600 }}
-      initialValues={{ remember: true }}
-      onFinish={onFinish}
-      onFinishFailed={onFinishFailed}
-      autoComplete="off"
-      layout='vertical'
-    >
-      <Flex justify='space-between' align='center'>
-        <Form.Item<FieldType>
-          label="Username"
-          name="username"
-          rules={[{ required: true, message: 'Please input your username!' }]}
-        >
-          <Input />
-        </Form.Item>
-
-        <Form.Item<FieldType>
-          label="Password"
-          name="password"
-          rules={[{ required: true, message: 'Please input your password!' }]}
-        >
-          <Input.Password />
-        </Form.Item>
-      </Flex>
-
-
-      <Form.Item<FieldType> name="remember" valuePropName="checked" label={null}>
-        <Checkbox>Remember me</Checkbox>
-      </Form.Item>
-
-      <Form.Item label={null}>
-        <Button type="primary" htmlType="submit">
-          Submit
-        </Button>
-      </Form.Item>
-    </Form>
-  </Flex>
-);
-
-export default App;
+export default App

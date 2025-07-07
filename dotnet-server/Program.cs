@@ -57,7 +57,7 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy
-                .WithOrigins("*") // Allow specific origin(s)
+                .WithOrigins("http://localhost:5173") // Allow specific origin(s)
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials(); // Required if you're sending cookies (like JWT in cookies)
@@ -75,6 +75,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors(MyAllowSpecificOrigins);
 
 app.UseHttpsRedirection();
 app.MapControllers();

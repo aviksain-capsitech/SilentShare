@@ -6,6 +6,14 @@ import {
 import { Home, SignUp, Login, MessagePage, Dashboard, Profile } from './Pages/index.ts';
 import './index.css';
 
+/*
+  Signup -> /signup
+  login -> /login
+  home -> /
+  dashboard -> /dashboard
+  public profile -> /user/:id
+*/
+
 const router = createBrowserRouter([
   {
     path: "/",
