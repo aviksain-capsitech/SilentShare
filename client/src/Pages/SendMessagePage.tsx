@@ -3,7 +3,8 @@ import TextArea from "antd/es/input/TextArea";
 import { useNavigate, useParams } from "react-router";
 import { SyncOutlined } from "@ant-design/icons";
 import { sendMessageApi } from "../Apis/message";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 const { Title } = Typography;
 const { Content } = Layout;
@@ -18,8 +19,22 @@ function SendMessagePage() {
   const { username } = useParams();
   const [content, setContent] = useState("");
   const navigate = useNavigate();
-
+  const [questions, setQuestions] = useState([]);
   const [messageApi, contextHolder] = message.useMessage();
+
+  const fetchQuestions = async () => {
+    const res: any = await axios.get("https://opentdb.com/api.php?amount=3");
+    if (res) setQuestions(res.data.results);
+    messageApi.open({
+      type: "success",
+      content: "Questions Fetch Successfully",
+      duration: 3,
+    })
+  }
+
+  useEffect(() => {
+    fetchQuestions();
+  }, []);
 
   const sendMessageToUser = async () => {
     try {
@@ -30,27 +45,40 @@ function SendMessagePage() {
           duration: 3,
         });
       }
-      
-      if (username === undefined) return;
+
+      if (!username) return;
 
       const res = await sendMessageApi({ username, content });
 
-      if (res) {
+      if (res.success) {
         messageApi.open({
           type: 'success',
-          content: res.message,
+          content: res.message || "Message send Successfully",
           duration: 3,
         });
 
         console.log(res);
         setContent("");
       }
+      else {
+        messageApi.open({
+          type: 'error',
+          content: res.message || "Something went wrong",
+          duration: 3,
+        });
+      }
 
 
-    } catch (error) {
+    } catch (error: any) {
       console.log("Send Message to User :: " + error);
+      messageApi.open({
+        type: 'error',
+        content: error.message,
+        duration: 3,
+      });
     }
   }
+
 
   return (
     <>
@@ -63,7 +91,6 @@ function SendMessagePage() {
           <div>
 
             <Row>
-
               <Col offset={6} span={22} style={{ marginBottom: "4px" }}>Content:</Col>
               <Col offset={6} span={22}>
                 <TextArea value={content} onChange={(e) => setContent(e.target.value)} style={{ backgroundColor: "Transparent", color: "#FFF", width: "60%", resize: "none" }} rows={4} />
@@ -74,25 +101,24 @@ function SendMessagePage() {
             </Row>
             <Row>
               <Col style={{ marginTop: "2%" }} offset={6} span={22}>
-                <Button color="primary" variant="solid">
+                <Button color="primary" variant="solid" onClick={() => fetchQuestions()}>
                   <SyncOutlined /> {"  "} Suggest Messages
                 </Button>
               </Col>
-              <Col style={{ marginTop: "2%" }} offset={6} span={12}>
-                <Button type="dashed" style={{ background: "transparent", color: "white" }} block>
-                  Suggested Question 1
-                </Button>
-              </Col>
-              <Col style={{ marginTop: "2%" }} offset={6} span={12}>
-                <Button type="dashed" style={{ background: "transparent", color: "white" }} block>
-                  Suggested Question 2
-                </Button>
-              </Col>
-              <Col style={{ marginTop: "2%" }} offset={6} span={12}>
-                <Button type="dashed" style={{ background: "transparent", color: "white" }} block>
-                  Suggested Question 3
-                </Button>
-              </Col>
+              {Array.isArray(questions) && questions.map((qus: any, index: number) => (
+                <Col key={index} style={{ marginTop: "2%" }} offset={6} span={12}>
+                  <Button 
+                    type="dashed" 
+                    style={{ background: "transparent", color: "white", width: "auto" }} 
+                    block
+                    onClick={() => {
+                      setContent(qus.question)
+                    }}
+                  >
+                    {qus.question}
+                  </Button>
+                </Col>
+              ))}
             </Row>
             <Row>
               <Col style={{ marginTop: "5%" }} offset={11} span={22}>

@@ -1,8 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace SilentShare.Models;
-
 public class User
 {
     [BsonId]
@@ -15,9 +13,10 @@ public class User
 
     public required string Password { get; set; }
 
-    public required Boolean IsAccepting { get; set; }
+    public bool IsAccepting { get; set; } = true;
 
     public DateTime CreatedAt { get; set; } = DateTime.Now; // take the current system time
 
     public DateTime UpdatedAt { get; set; } = DateTime.Now;
 }
+

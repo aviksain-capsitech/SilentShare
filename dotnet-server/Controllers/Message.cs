@@ -38,43 +38,23 @@ public class MessageController : ControllerBase
                 return BadRequest("Content and Title is Required."); // status code 400
             }
 
+            var existing = await _userService.GetByUsernameAsync(username);
+
+            if (existing == null)
+            {
+                return BadRequest(new { Success = false, Message = "Username does not exist" });
+            }
+
+            if (!existing.IsAccepting)
+            {
+                return BadRequest(new { Success = false, Message = "User is not Accepting Messages" });
+            }
+
             newMessage.Owner = username;
             newMessage.Content = newMessage.Content.Trim();
 
             await _messageService.CreateAsync(newMessage);
             return Ok(new { Success = true, Message = "Message Send Successfully", data = newMessage }); // status code 200
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Unhandled error occurred");
-            return StatusCode(500, "Something went wrong on the server.");
-        }
-    }
-
-    [HttpPost("Update/{MessageId:length(24)}")]
-    public async Task<IActionResult> UpdateMessage(string messageId, [FromBody] Message updatedMessage)
-    {
-        try
-        {
-            var userId = GetUserId();
-
-            if (userId == null)
-            {
-                return Unauthorized("You needed to login to update Message");
-            }
-
-            var existing = await _messageService.GetByIdAsync(messageId);
-
-            if (existing == null || existing.Owner != userId)
-                return Unauthorized();
-
-            if (updatedMessage.Content != null)
-                existing.Content = updatedMessage.Content;
-
-            existing.UpdatedAt = DateTime.UtcNow;
-
-            await _messageService.UpdateAsync(messageId, existing);
-            return Ok(new { Success = true, Message = "Message Updated Successfully", data = existing });
         }
         catch (Exception ex)
         {
@@ -142,6 +122,17 @@ public class MessageController : ControllerBase
 
 
     // fetch all the messages by the username 
+
+
+    /*
+        {
+            pageNo=1
+            limit=9
+
+
+        }
+    */
+    
     [HttpGet("Get-All")]
     public async Task<IActionResult> GetAllUserMessages()
     {

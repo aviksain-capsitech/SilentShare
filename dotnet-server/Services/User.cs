@@ -1,5 +1,4 @@
 using MongoDB.Driver;
-using SilentShare.Models;
 
 public class UserService
 {
@@ -31,5 +30,20 @@ public class UserService
 
     public async Task<User> GetByIdAsync(string id) =>
         await _users.Find(u => u.Id == id).FirstOrDefaultAsync();
+
+    public async Task<bool> ToggleIsAccepting(string userId)
+    {
+        var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
+
+        // Get current user to toggle the value
+        var user = await _users.Find(filter).FirstOrDefaultAsync();
+        if (user == null) return false;
+
+        var update = Builders<User>.Update.Set(u => u.IsAccepting, !user.IsAccepting);
+
+        var result = await _users.UpdateOneAsync(filter, update);
+
+        return result.ModifiedCount > 0;
+    }
 
 }

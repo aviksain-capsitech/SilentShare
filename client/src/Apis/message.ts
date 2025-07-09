@@ -1,22 +1,16 @@
 import { axiosInstance } from "../Helper/axiosInstance"
 
+
 export const sendMessageApi = async ({username,content}:{username:string;content:String;}) =>  {
     try {
         const res = await axiosInstance.post(`/message/create/${username}`, {content});
         return res.data;
-    } catch (error) {
-        
+    } catch (error: any) {
+        console.log("Send Messages Api Error :: ", error);
+        return error?.response?.data
     }
 }
 
-export const getMessagesApi = async () => {
-    try {
-        const res = await axiosInstance.get('/message/get-all');
-        if(res) return res.data;
-    } catch (error) {
-        console.log("Get Messages Api Error :: ", error);
-    }
-}
 
 export const deleteMessageApi = async (id:{id:string}) => {
     try {
@@ -25,5 +19,15 @@ export const deleteMessageApi = async (id:{id:string}) => {
         if(res) return res.data;
     } catch (error) {
         console.log("Delete Messages Api Error :: ",error);
+    }
+}
+
+
+export const getMessagesApi = async () => {
+    try {
+        const res = await axiosInstance.get('/message/get-all');
+        if(res) return res.data;
+    } catch (error) {
+        console.log("Get Messages Api Error :: ", error);
     }
 }

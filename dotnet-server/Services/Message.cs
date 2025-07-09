@@ -17,12 +17,6 @@ public class MessageService
         return message;
     }
 
-    public async Task<Message> UpdateAsync(string id, Message newMessage)
-    {
-        await _messages.ReplaceOneAsync(u => u.Id == id, newMessage);
-        return newMessage;
-    }
-
     public async Task<Message?> DeleteAsync(string id)
     {
         var message = await _messages.Find(m => m.Id == id).FirstOrDefaultAsync();

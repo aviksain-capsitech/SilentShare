@@ -53,16 +53,17 @@ public class UserController : ControllerBase
 
             var existingByEmail = await _userService.GetByEmailAsync(userInput.Email);
 
-            var existingUsername = await _userService.GetByUsernameAsync(userInput.Username); 
+            var existingUsername = await _userService.GetByUsernameAsync(userInput.Username);
 
             if (existingByEmail != null)
-                return BadRequest(new {Success = false, Message = "Email already in use"});
+                return BadRequest(new { Success = false, Message = "Email already in use" });
 
             if (existingUsername != null)
                 return BadRequest("Username already in use");
 
             userInput.Email = userInput.Email.Trim().ToLower();
             userInput.Username = userInput.Username.Trim().ToLower();
+            userInput.IsAccepting = true;
             userInput.Password = HashPassword(userInput.Password);
 
             var user = await _userService.CreateAsync(userInput);
@@ -109,6 +110,7 @@ public class UserController : ControllerBase
                 existingUser.Id,
                 existingUser.Email,
                 existingUser.Username,
+                existingUser.IsAccepting,
                 existingUser.CreatedAt,
                 existingUser.UpdatedAt
             };
@@ -147,4 +149,20 @@ public class UserController : ControllerBase
         return Ok(new { Success = true, Message = "User fetched Successfully", data = user });
     }
 
+    [HttpPut("toggle-user")]
+    public async Task<IActionResult> ToggleUser()
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized("No valid user ID found in token.");
+
+        var boolRes = await _userService.ToggleIsAccepting(userId);
+
+        if (!boolRes)
+            return BadRequest("Unable to toggle the Accepting Messages");
+
+        return Ok(new { Success = true, Message = "Message Toggled Successfully" });
+    }
+    
 }

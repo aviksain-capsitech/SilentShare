@@ -10,8 +10,8 @@ function Navbar({
   backgroundColor
 }: { backgroundColor: string }) {
 
-  const user = useSelector((state: any) => state.auth?.status);
-
+  const userStatus = useSelector((state: any) => state.auth?.status);
+  
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -30,12 +30,12 @@ function Navbar({
           <Col span={4}>
             <Flex gap="small" style={{ marginTop: '12px' }} wrap>
               {
-                user ? (
+                userStatus ? (
                   <>
                     <Button color="primary" variant="solid" onClick={async () => {
                       await LogoutApi();
-                      navigate('/');
                       dispatch(deleteUserData());
+                      navigate('/');
                     }}>
                       Logout
                     </Button>

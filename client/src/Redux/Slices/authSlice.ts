@@ -18,6 +18,11 @@ export const authSlice = createSlice({
       state.status = true;
       state.userData = action.payload;
     },
+    toggleUser: (state) => {
+      if (state.userData) {
+        state.userData.IsAccepting = !(state.userData.IsAccepting);
+      }
+    },
     deleteUserData: (state) => {
       state.status = false;
       state.userData = null;
@@ -25,6 +30,6 @@ export const authSlice = createSlice({
   },
 });
 
-export const { saveUserData, deleteUserData } = authSlice.actions;
+export const { saveUserData, toggleUser, deleteUserData } = authSlice.actions;
 
 export default authSlice.reducer;

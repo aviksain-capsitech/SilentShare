@@ -36,3 +36,14 @@ export const LogoutApi = async () => {
         console.log("Logout Api Error :: ", error);
     }
 }
+
+export const ToggleIsAcceptingApi = async () => {
+    try {
+        const res = await axiosInstance.put('/user/toggle-user');
+        if(res) {
+            return res.data;
+        }
+    } catch (error) {
+        console.log("ToggleIsAccepting Api Error :: ", error);
+    }
+}
