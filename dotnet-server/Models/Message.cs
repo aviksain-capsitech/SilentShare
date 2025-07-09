@@ -7,20 +7,12 @@ public class Message
   [BsonRepresentation(BsonType.ObjectId)]
   public string? Id { get; set; }
 
-  [BsonElement("owner")]
-  [BsonRepresentation(BsonType.ObjectId)]
-  public string? OwnerId { get; set; }
+  public string? Owner { get; set; }
 
-  [BsonElement("title")]
-  public string? Title { get; set; }
-
-  [BsonElement("content")]
   public string? Content { get; set; }
 
-  [BsonElement("createdAt")]
-  public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+  public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // take the universal time
 
-  [BsonElement("updatedAt")]
   public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }
 

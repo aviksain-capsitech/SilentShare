@@ -20,6 +20,12 @@ const SignUp = () => {
   const onFinish = async (values: SignUpType) => {
     setLoading(true);
 
+    messageApi.open({
+      type: "warning",
+      content: "Do not Refresh the page",
+      duration: 3
+    });
+
     setTimeout(async () => {
       console.log('Received values of form: ', values);
 
@@ -40,10 +46,8 @@ const SignUp = () => {
         }, 5000);
       }
 
+      setLoading(false);
     }, 5000);
-
-
-    setLoading(false);
   };
 
   return (
@@ -66,12 +70,12 @@ const SignUp = () => {
             layout="vertical"
           >
             <Form.Item
-              name="fullname"
-              label="Full Name"
+              name="username"
+              label="Username"
               rules={[{ required: true, message: 'Please enter your name!' }]}
             >
               <Input
-                placeholder="Full Name"
+                placeholder="Username"
                 disabled={loading}
               />
             </Form.Item>
@@ -105,11 +109,11 @@ const SignUp = () => {
             </Form.Item>
 
             <Form.Item style={{ textAlign: 'center' }}>
-              Already have an account ? <NavLink to="/login">Login</NavLink>
-            </Form.Item>
-
-            <Form.Item style={{ marginBottom: 0, textAlign: 'center' }}>
-              <a href="/forgot-password">Forgot password?</a>
+              Already have an account ? <NavLink style={loading ? { cursor: "not-allowed" } : { cursor: "pointer" }} to="/login" onClick={(e) => {
+                if (loading) {
+                  e.preventDefault(); // Stop navigation
+                }
+              }}>Login</NavLink>
             </Form.Item>
           </Form>
         </Card>

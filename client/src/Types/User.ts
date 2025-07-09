@@ -1,5 +1,5 @@
 export type SignUpType = {
-    fullname: string,
+    username: string,
     email: string,
     password: string
 }

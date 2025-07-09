@@ -8,42 +8,41 @@ namespace SilentShare.Controllers;
 [Route("Api/[controller]")]
 public class MessageController : ControllerBase
 {
+    private readonly UserService _userService;
     private readonly MessageService _messageService;
     private readonly ILogger<MessageController> _logger;
 
-    public MessageController(ILogger<MessageController> logger, MessageService messageService)
+    public MessageController(ILogger<MessageController> logger, MessageService messageService, UserService userService)
     {
         _logger = logger;
         _messageService = messageService;
+        _userService = userService;
     }
 
     private string? GetUserId() =>
       User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-    [HttpPost("Create")]
-    public async Task<IActionResult> CreateMessage([FromBody] Message newMessage)
+    private string? GetUsername()
+    {
+        return User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+    }
+
+    // create a message to the owner by username as owner
+    [HttpPost("Create/{username}")]
+    public async Task<IActionResult> CreateMessage(string username, [FromBody] Message newMessage)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(newMessage.Content) ||
-                string.IsNullOrWhiteSpace(newMessage.Title))
+            if (string.IsNullOrWhiteSpace(newMessage.Content))
             {
                 return BadRequest("Content and Title is Required."); // status code 400
             }
 
-            var userId = GetUserId();
-
-            if (userId == null)
-            {
-                return Unauthorized("You needed to login to create Message"); // status code 500
-            }
-
-            newMessage.OwnerId = userId;
-            newMessage.Title = newMessage.Title.Trim();
+            newMessage.Owner = username;
             newMessage.Content = newMessage.Content.Trim();
 
             await _messageService.CreateAsync(newMessage);
-            return Ok(new { Success=true, Message="Message Created Successfully", data=newMessage }); // status code 200
+            return Ok(new { Success = true, Message = "Message Send Successfully", data = newMessage }); // status code 200
         }
         catch (Exception ex)
         {
@@ -61,16 +60,13 @@ public class MessageController : ControllerBase
 
             if (userId == null)
             {
-                return BadRequest("You needed to login to update Message");
+                return Unauthorized("You needed to login to update Message");
             }
 
             var existing = await _messageService.GetByIdAsync(messageId);
 
-            if (existing == null || existing.OwnerId != userId)
+            if (existing == null || existing.Owner != userId)
                 return Unauthorized();
-
-            if (updatedMessage.Title != null)
-                existing.Title = updatedMessage.Title;
 
             if (updatedMessage.Content != null)
                 existing.Content = updatedMessage.Content;
@@ -78,7 +74,7 @@ public class MessageController : ControllerBase
             existing.UpdatedAt = DateTime.UtcNow;
 
             await _messageService.UpdateAsync(messageId, existing);
-            return Ok(new { Success=true, Message="Message Updated Successfully", data=existing });
+            return Ok(new { Success = true, Message = "Message Updated Successfully", data = existing });
         }
         catch (Exception ex)
         {
@@ -87,6 +83,7 @@ public class MessageController : ControllerBase
         }
     }
 
+    // delete a particular message by message id
     [HttpDelete("Delete/{MessageId:length(24)}")]
     public async Task<IActionResult> DeleteMessage(string messageId)
     {
@@ -94,19 +91,25 @@ public class MessageController : ControllerBase
         {
             var userId = GetUserId();
 
+            var username = GetUsername();
+
             if (userId == null)
             {
-                return BadRequest("You needed to login to delete Message");
+                return Unauthorized("You needed to login to delete Message");
             }
+
+            // Console.Write(messageId);
 
             var existing = await _messageService.GetByIdAsync(messageId);
 
-            if (existing == null || existing.OwnerId != userId)
-                return Unauthorized("Unable to find the Message");
+            Console.Write(existing.Owner);
+
+            if (existing == null || existing.Owner != username)
+                return BadRequest("Unable to delete the Message");
 
             var deletedMessage = await _messageService.DeleteAsync(messageId);
 
-            return Ok(new { Success=true, Message="Message Deleted Successfully", data=deletedMessage });
+            return Ok(new { Success = true, Message = "Message Deleted Successfully", data = deletedMessage });
         }
         catch (Exception ex)
         {
@@ -129,7 +132,7 @@ public class MessageController : ControllerBase
 
         if (message != null)
         {
-            return Ok(new { Success=true, Message="Message fetched Successfully", data=message });
+            return Ok(new { Success = true, Message = "Message fetched Successfully", data = message });
         }
         else
         {
@@ -137,7 +140,9 @@ public class MessageController : ControllerBase
         }
     }
 
-    [HttpGet("User/Get-All")]
+
+    // fetch all the messages by the username 
+    [HttpGet("Get-All")]
     public async Task<IActionResult> GetAllUserMessages()
     {
         var userId = GetUserId();
@@ -147,22 +152,11 @@ public class MessageController : ControllerBase
             return BadRequest("You needed to login to get all Messages");
         }
 
-        var messages = await _messageService.GetAllByUserIdAsync(userId);
-        return Ok(new { Success=true, Message="All User Messages fetched Successfully", data=messages });
-    }
+        var userDetails = await _userService.GetByIdAsync(userId);
+        Console.Write("User Details: " + userDetails);
 
-    [HttpGet("Get-All")]
-    public async Task<IActionResult> GetAllMessages()
-    {
-        var userId = GetUserId();
-
-        if (userId == null)
-        {
-            return BadRequest("You needed to login to get all Messages");
-        }
-
-        var messages = await _messageService.GetAllAsync();
-        return Ok(new { Success=true, Message="All Messages fetched Successfully", data=messages });
+        var messages = await _messageService.GetAllByUsernameAsync(userDetails.Username);
+        return Ok(new { Success = true, Message = "All User Messages fetched Successfully", data = messages });
     }
 }
 

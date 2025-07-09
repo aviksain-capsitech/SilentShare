@@ -1,7 +1,9 @@
 import React from 'react';
-import { Button, Flex, Layout, message, Typography } from 'antd';
+import { Button, Flex, Layout, Typography } from 'antd';
 import { Col, Row } from 'antd';
 import { ArrowRightOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router';
+import { useSelector } from 'react-redux';
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -21,16 +23,12 @@ const contentStyle: React.CSSProperties = {
 
 function Body() {
 
-  const [messageApi, contextHolder] = message.useMessage();
-
-  const info = () => {
-    messageApi.info('Hello, Ant Design!');
-  };
+  const user = useSelector((state: any) => state.auth?.status);
+  const navigate = useNavigate();
 
 
   return (
     <>
-      {contextHolder}
       <Content style={contentStyle}>
         <div>
           <Row>
@@ -53,12 +51,22 @@ function Body() {
           <Row>
             <Col span={12} offset={6}>
               <Flex gap="small" style={{ marginTop: '12px' }} justify='center' wrap>
-                <Button color="primary" variant="text" onClick={info}>
-                  Login
-                </Button>
-                <Button color="primary" variant="solid">
-                  SignUp
-                </Button>
+                {
+                  user ? (<><Button color="primary" variant="solid" onClick={() => {
+                    navigate("/dashboard")
+                  }}>
+                    Go to Dashboard 
+                  </Button></>) : (<><Button color="primary" variant="text" onClick={() => {
+                    navigate("/login")
+                  }}>
+                    Login
+                  </Button>
+                    <Button color="primary" variant="solid" onClick={() => {
+                      navigate("/signup")
+                    }}>
+                      SignUp
+                    </Button></>)
+                }
               </Flex>
             </Col>
           </Row>

@@ -18,6 +18,12 @@ const Login = () => {
   const onFinish = (values: any) => {
     setLoading(true);
 
+    messageApi.open({
+      type: "loading",
+      content: "Do not Refresh the page",
+      duration: 3
+    });
+
     setTimeout(async () => {
       console.log('Received values of form: ', values);
 
@@ -93,11 +99,11 @@ const Login = () => {
             </Form.Item>
 
             <Form.Item style={{ textAlign: 'center' }}>
-              Don't have an account ? <NavLink to="/signup">Sign Up</NavLink>
-            </Form.Item>
-
-            <Form.Item style={{ marginBottom: 0, textAlign: 'center' }}>
-              <NavLink to="/forgot-password">Forgot password?</NavLink>
+              Don't have an account ? <NavLink style={loading ? { cursor: "not-allowed" } : { cursor: "pointer" }} to="/signup" onClick={(e) => {
+                if (loading) {
+                  e.preventDefault(); // Stop navigation
+                }
+              }}>Sign Up</NavLink>
             </Form.Item>
           </Form>
         </Card>

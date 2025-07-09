@@ -23,6 +23,7 @@ public class JwtHelper
             Subject = new ClaimsIdentity(new[]  // ClaimsIdentity: basically it is for the payload for reverification
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id ?? string.Empty),
+                new Claim(ClaimTypes.Name, user.Username ?? string.Empty),
                 new Claim(ClaimTypes.Email, user.Email ?? string.Empty)
             }),
             Expires = DateTime.UtcNow.AddHours(6),  // Token will expire in 6 hour.

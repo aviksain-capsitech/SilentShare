@@ -1,10 +1,20 @@
 import { Button, Col, Flex, Layout, Row } from 'antd';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router';
+import { LogoutApi } from '../Apis/user';
+import { deleteUserData } from '../Redux/Slices/authSlice';
 
 const { Header } = Layout;
 
 function Navbar({
   backgroundColor
 }: { backgroundColor: string }) {
+
+  const user = useSelector((state: any) => state.auth?.status);
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   return (
     <>
       <Header style={{
@@ -19,12 +29,32 @@ function Navbar({
           <Col span={16}></Col>
           <Col span={4}>
             <Flex gap="small" style={{ marginTop: '12px' }} wrap>
-              <Button color="primary" variant="text">
-                Login
-              </Button>
-              <Button color="primary" variant="solid">
-                SignUp
-              </Button>
+              {
+                user ? (
+                  <>
+                    <Button color="primary" variant="solid" onClick={async () => {
+                      await LogoutApi();
+                      navigate('/');
+                      dispatch(deleteUserData());
+                    }}>
+                      Logout
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button color="primary" variant="text" onClick={() => {
+                      navigate("/login")
+                    }}>
+                      Login
+                    </Button>
+                    <Button color="primary" variant="solid" onClick={() => {
+                      navigate("/signup")
+                    }}>
+                      Signup
+                    </Button>
+                  </>
+                )
+              }
             </Flex>
           </Col>
         </Row>

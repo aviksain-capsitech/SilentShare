@@ -34,9 +34,8 @@ public class MessageService
         return message;
     }
 
-
-    public async Task<List<Message>> GetAllByUserIdAsync(string userId) =>
-        await _messages.Find(t => t.OwnerId == userId).ToListAsync();
+    public async Task<List<Message>> GetAllByUsernameAsync(string username) =>
+        await _messages.Find(t => t.Owner == username).ToListAsync();
 
     public async Task<Message> GetByIdAsync(string id) =>
         await _messages.Find(t => t.Id == id).FirstOrDefaultAsync();

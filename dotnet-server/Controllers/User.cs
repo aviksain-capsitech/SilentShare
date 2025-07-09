@@ -45,18 +45,24 @@ public class UserController : ControllerBase
         try
         {
             if (string.IsNullOrWhiteSpace(userInput.Email) ||
-                string.IsNullOrWhiteSpace(userInput.Fullname) ||
+                string.IsNullOrWhiteSpace(userInput.Username) ||
                 string.IsNullOrWhiteSpace(userInput.Password))
             {
                 return BadRequest("Email, Full Name, and Password are required.");
             }
 
-            var existing = await _userService.GetByEmailAsync(userInput.Email);
-            if (existing != null)
-                return BadRequest("Email already in use");
+            var existingByEmail = await _userService.GetByEmailAsync(userInput.Email);
+
+            var existingUsername = await _userService.GetByUsernameAsync(userInput.Username); 
+
+            if (existingByEmail != null)
+                return BadRequest(new {Success = false, Message = "Email already in use"});
+
+            if (existingUsername != null)
+                return BadRequest("Username already in use");
 
             userInput.Email = userInput.Email.Trim().ToLower();
-            userInput.Fullname = userInput.Fullname.Trim().ToLower();
+            userInput.Username = userInput.Username.Trim().ToLower();
             userInput.Password = HashPassword(userInput.Password);
 
             var user = await _userService.CreateAsync(userInput);
@@ -102,7 +108,7 @@ public class UserController : ControllerBase
             {
                 existingUser.Id,
                 existingUser.Email,
-                existingUser.Fullname,
+                existingUser.Username,
                 existingUser.CreatedAt,
                 existingUser.UpdatedAt
             };
