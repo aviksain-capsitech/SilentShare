@@ -120,21 +120,8 @@ public class MessageController : ControllerBase
         }
     }
 
-
-    // fetch all the messages by the username 
-
-
-    /*
-        {
-            pageNo=1
-            limit=9
-
-
-        }
-    */
-    
-    [HttpGet("Get-All")]
-    public async Task<IActionResult> GetAllUserMessages()
+    [HttpGet("Get-All/")]
+    public async Task<IActionResult> GetAllUserMessages([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
         var userId = GetUserId();
 
@@ -146,8 +133,10 @@ public class MessageController : ControllerBase
         var userDetails = await _userService.GetByIdAsync(userId);
         Console.Write("User Details: " + userDetails);
 
-        var messages = await _messageService.GetAllByUsernameAsync(userDetails.Username);
-        return Ok(new { Success = true, Message = "All User Messages fetched Successfully", data = messages });
+        var result = await _messageService.GetAllByUsernameAsync(userDetails.Username, page, pageSize);
+        return Ok(new { Success = true, Message = "Messages fetched Successfully", data = result });
     }
+
+    
 }
 

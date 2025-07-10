@@ -84,16 +84,16 @@ function SendMessagePage() {
     <>
       {contextHolder}
       <Layout style={layoutStyle}>
-        <Content style={{ backgroundColor: "#001529", color: "white", padding: "2%", width: "auto" }}>
+        <Content style={{ padding: "2%", width: "auto" }}>
           <Flex justify="center" align="center">
-            <Title style={{ color: "white" }} level={2}>Share Your Thoughts to {username}</Title>
+            <Title level={2}>Share Your Thoughts to {username}</Title>
           </Flex>
           <div>
 
             <Row>
               <Col offset={6} span={22} style={{ marginBottom: "4px" }}>Content:</Col>
               <Col offset={6} span={22}>
-                <TextArea value={content} onChange={(e) => setContent(e.target.value)} style={{ backgroundColor: "Transparent", color: "#FFF", width: "60%", resize: "none" }} rows={4} />
+                <TextArea value={content} onChange={(e) => setContent(e.target.value)} style={{ width: "60%", resize: "none" }} rows={4} />
               </Col>
               <Col style={{ marginTop: "10px" }} offset={6} span={22}>
                 <Button color="primary" variant="solid" onClick={sendMessageToUser}>Send</Button>
@@ -109,7 +109,7 @@ function SendMessagePage() {
                 <Col key={index} style={{ marginTop: "2%" }} offset={6} span={12}>
                   <Button 
                     type="dashed" 
-                    style={{ background: "transparent", color: "white", width: "auto" }} 
+                    style={{ width: "auto" }} 
                     block
                     onClick={() => {
                       setContent(qus.question)

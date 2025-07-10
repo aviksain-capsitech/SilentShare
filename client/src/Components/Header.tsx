@@ -1,4 +1,4 @@
-import { Button, Col, Flex, Layout, Row } from 'antd';
+import { Button, Col, Flex, Layout, Popconfirm, Row } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { LogoutApi } from '../Apis/user';
@@ -6,12 +6,10 @@ import { deleteUserData } from '../Redux/Slices/authSlice';
 
 const { Header } = Layout;
 
-function Navbar({
-  backgroundColor
-}: { backgroundColor: string }) {
+function Navbar() {
 
   const userStatus = useSelector((state: any) => state.auth?.status);
-  
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -22,23 +20,33 @@ function Navbar({
         height: 64,
         paddingInline: 48,
         lineHeight: '64px',
-        backgroundColor: backgroundColor,
+        color: "black",
+        backgroundColor: '#F5F5F5'
       }}>
         <Row>
-          <Col span={4} style={{ color: 'white' }}>Silent Share</Col>
+          <Col span={4}>Silent Share</Col>
           <Col span={16}></Col>
           <Col span={4}>
             <Flex gap="small" style={{ marginTop: '12px' }} wrap>
               {
                 userStatus ? (
                   <>
-                    <Button color="primary" variant="solid" onClick={async () => {
-                      await LogoutApi();
-                      dispatch(deleteUserData());
-                      navigate('/');
-                    }}>
-                      Logout
-                    </Button>
+                    <Popconfirm
+                      title="LogOut"
+                      description="LogOut this Account ?"
+                      onConfirm={async () => {
+                        await LogoutApi();
+                        dispatch(deleteUserData());
+                        navigate('/');
+                      }}
+                      okText="Yes"
+                      cancelText="No"
+                    >
+                      <Button color="primary" variant="solid" >
+                        Logout
+                      </Button>
+                    </Popconfirm>
+
                   </>
                 ) : (
                   <>

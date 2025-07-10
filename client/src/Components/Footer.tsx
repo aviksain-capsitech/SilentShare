@@ -1,18 +1,14 @@
-import React from 'react';
 import { Col, Layout, Row, Space } from 'antd';
 import { FacebookFilled, GithubFilled, InstagramFilled, TwitterCircleFilled, YoutubeFilled } from '@ant-design/icons';
 
 const { Footer } = Layout;
 
-function Footerr({
-  backgroundColor
-}: { backgroundColor: string }) {
+function Footerr() {
   return (
     <>
       <Footer style={{
         textAlign: 'center',
-        color: 'white',
-        backgroundColor: backgroundColor,
+        color: "black",
       }}>
         <Row>
           <Col span={8}>© 2025 Silent Share, Inc. All rights reserved.</Col>

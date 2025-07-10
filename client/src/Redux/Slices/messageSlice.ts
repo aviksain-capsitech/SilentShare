@@ -17,12 +17,12 @@ const initialState: CounterState = {
 };
 
 export const messageSlice = createSlice({
-  name: "todo",
+  name: "message",
   initialState,
   reducers: {
     // saves the all messages of the user
     saveMessages: (state, action) => {
-      state.messages = action.payload
+      state.messages = Array.isArray(action.payload) ? action.payload : [];
     },
 
     // if user deletes a message

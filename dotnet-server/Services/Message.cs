@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using MongoDB.Driver;
 
 public class MessageService
@@ -28,8 +29,35 @@ public class MessageService
         return message;
     }
 
-    public async Task<List<Message>> GetAllByUsernameAsync(string username) =>
-        await _messages.Find(t => t.Owner == username).ToListAsync();
+    public class PaginatedResult<T>
+    {
+        public List<T> Items { get; set; }
+        public long TotalCount { get; set; }
+        public int PageNumber { get; set; }
+        public int PageSize { get; set; }
+    }
+
+    public async Task<PaginatedResult<Message>> GetAllByUsernameAsync(string username, int pageNumber, int pageSize)
+    {
+        var filter = Builders<Message>.Filter.Eq(m => m.Owner, username);
+
+        var totalCount = await _messages.CountDocumentsAsync(filter);
+
+        var messages = await _messages
+        .Find(filter)
+        .Skip((pageNumber - 1) * pageSize)
+        .Limit(pageSize)
+        .SortByDescending(m => m.CreatedAt)
+        .ToListAsync();
+
+        return new PaginatedResult<Message>
+        {
+            Items = messages,
+            TotalCount = totalCount,
+            PageNumber = pageNumber,
+            PageSize = pageSize
+        };
+    }
 
     public async Task<Message> GetByIdAsync(string id) =>
         await _messages.Find(t => t.Id == id).FirstOrDefaultAsync();
