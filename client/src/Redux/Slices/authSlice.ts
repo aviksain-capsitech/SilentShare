@@ -1,4 +1,4 @@
-import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
 export interface CounterState {
   status: boolean;
@@ -14,15 +14,17 @@ export const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    saveUserData: (state, action: PayloadAction<{ userData: any }>) => {
+    saveUserData: (state, action) => {
       state.status = true;
       state.userData = action.payload;
     },
+
     toggleUser: (state) => {
       if (state.userData) {
-        state.userData.IsAccepting = !(state.userData.IsAccepting);
+        state.userData.isAccepting = !(state.userData.isAccepting);
       }
     },
+
     deleteUserData: (state) => {
       state.status = false;
       state.userData = null;

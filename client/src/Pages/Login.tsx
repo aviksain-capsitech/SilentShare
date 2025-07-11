@@ -2,6 +2,8 @@ import { Form, Input, Button, Typography, Card, message } from 'antd';
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router';
 import { LoginApi } from '../Apis/user';
+import { saveUserData as saveUserDataRedux } from '../Redux/Slices/authSlice';
+import { useDispatch } from 'react-redux';
 
 const { Title } = Typography;
 
@@ -10,44 +12,49 @@ const Login = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const navigate = useNavigate();
-
   const [messageApi, contextHolder] = message.useMessage();
-
   const [form] = Form.useForm();
+  const dispatch = useDispatch();
+
+
 
   const onFinish = (values: any) => {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    messageApi.open({
-      type: "loading",
-      content: "Do not Refresh the page",
-      duration: 3
-    });
+      messageApi.open({
+        type: "loading",
+        content: "Do not Refresh the page",
+        duration: 3
+      });
 
-    setTimeout(async () => {
-      console.log('Received values of form: ', values);
+      setTimeout(async () => {
+        const res: any = await LoginApi(values);
 
-      const res: any = await LoginApi(values);
-      console.log(res);
-
-      if (res) {
-        form.resetFields();
-        messageApi.open({
-          type: 'success',
-          content: res.message,
-          duration: 3,
-        });
-
-        setTimeout(() => {
-          navigate("/dashboard");
+        if (res) {
           form.resetFields();
-        }, 5000);
-      }
-      setLoading(false);
-    }, 5000);
+          dispatch(saveUserDataRedux(res.data));
+          messageApi.open({
+            type: 'success',
+            content: res.message,
+            duration: 3,
+          });
 
-
-
+          setTimeout(() => {
+            navigate("/dashboard");
+            form.resetFields();
+          }, 3000);
+        }
+        setLoading(false);
+      }, 5000);
+    } 
+    catch (error: any) {
+      messageApi.open({
+        type: "error",
+        content: error.message,
+        duration: 3
+      });
+    }
   };
 
   return (
@@ -79,7 +86,6 @@ const Login = () => {
                 disabled={loading}
               />
             </Form.Item>
-
 
             <Form.Item
               name="password"

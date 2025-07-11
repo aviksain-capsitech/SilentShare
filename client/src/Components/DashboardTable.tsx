@@ -3,10 +3,9 @@ import type { GetProp, TableProps } from 'antd';
 import { Button, message, Modal, Popconfirm, Skeleton, Space, Table } from 'antd';
 import type { AnyObject } from 'antd/es/_util/type';
 import type { SorterResult } from 'antd/es/table/interface';
-import { deleteMessageApi } from '../Apis/message';
+import { deleteMessageApi, getMessagesApi } from '../Apis/message';
 import { deleteMessage as deleteMessageRedux, saveMessages as saveMessagesRedux } from "../Redux/Slices/messageSlice";
-import { useDispatch } from 'react-redux';
-import { axiosInstance } from '../Helper/axiosInstance';
+import { useDispatch, useSelector } from 'react-redux';
 
 type ColumnsType<T extends object = object> = TableProps<T>['columns'];
 type TablePaginationConfig = Exclude<GetProp<TableProps, 'pagination'>, boolean>;
@@ -77,7 +76,7 @@ const getRandomuserParams = (params: TableParams) => {
 };
 
 const DashboardTable: React.FC = () => {
-    const [data, setData] = useState<DataType[]>();
+    const data = useSelector((state: any) => state.message?.messages);
     const [loading, setLoading] = useState(false);
     const [tableParams, setTableParams] = useState<TableParams>({
         pagination: {
@@ -96,12 +95,18 @@ const DashboardTable: React.FC = () => {
             title: 'Message',
             dataIndex: 'content',
             width: '40%',
+            render: (content: string) => {
+                return <>{content.length > 120 ? (<>{content.slice(0, 120)}...</>) : (<>{content}</>)}</>;
+            }
         },
         {
             title: 'Date',
             dataIndex: 'updatedAt',
             // sorter: true,
             width: '30%',
+            render: (date: Date) => (
+                <>{formatDate(date.toString())}</>
+            )
         },
         {
             title: 'Action',
@@ -116,14 +121,23 @@ const DashboardTable: React.FC = () => {
                         title="Delete the message"
                         description="Are you sure to delete this message?"
                         onConfirm={async () => {
-                            await deleteMessageApi(msg?.id);
-                            dispatch(deleteMessageRedux(msg?.id));
+                            try {
+                                await deleteMessageApi(msg?.id);
+                                dispatch(deleteMessageRedux(msg?.id));
 
-                            messageApi.open({
-                                type: "success",
-                                content: "Message Deleted Successfully",
-                                duration: 3
-                            });
+                                messageApi.open({
+                                    type: "success",
+                                    content: "Message Deleted Successfully",
+                                    duration: 3
+                                });
+                            } catch (error) {
+                                messageApi.open({
+                                    type: "error",
+                                    content: "Unable to delete the message",
+                                    duration: 3
+                                })
+                            }
+
                         }}
                         okText="Yes"
                         cancelText="No"
@@ -139,21 +153,14 @@ const DashboardTable: React.FC = () => {
         setLoading(true);
 
         const queryParams = toURLSearchParams(getRandomuserParams(tableParams));
-        const url = `${import.meta.env.VITE_BACKEND_URL}message/get-all?${queryParams.toString()}`;
 
         try {
-            const res: any = await axiosInstance.get(url);
-
-            const items = res?.data?.data?.items || [];
-            const total = res?.data?.data?.totalCount || 0;
-
+            const res: any = await getMessagesApi({ queryParams });
+            // console.log(res?.data?.data?.items)
+            const items = res.items || [];
+            const total = res.totalCount || 0;
 
             dispatch(saveMessagesRedux(items));
-
-            setData(items.map((item: any) => ({
-                ...item,
-                updatedAt: formatDate(item.updatedAt)
-            })));
 
             setTableParams((prev) => ({
                 ...prev,
@@ -164,6 +171,11 @@ const DashboardTable: React.FC = () => {
             }));
         } catch (err) {
             console.error("Error fetching messages:", err);
+            messageApi.open({
+                type: "error",
+                content: "Something went wrong",
+                duration: 3
+            })
         } finally {
             setLoading(false);
         }
@@ -189,7 +201,7 @@ const DashboardTable: React.FC = () => {
 
         // `dataSource` is useless since `pageSize` changed
         if (pagination.pageSize !== tableParams.pagination?.pageSize) {
-            setData([]);
+            dispatch(saveMessagesRedux([]))
         }
     };
 
@@ -213,6 +225,7 @@ const DashboardTable: React.FC = () => {
 
                 }}
                 centered
+
                 footer={<></>}
             >
                 <p><b>Message:</b> {selectedMessage?.content}</p>
@@ -221,7 +234,7 @@ const DashboardTable: React.FC = () => {
             {loading ? (
                 <Skeleton
                     active
-                    paragraph={{ rows: 8 }}
+                    paragraph={{ rows: 10 }}
                     title={false}
                     style={{ padding: 24 }}
                 />
@@ -232,6 +245,11 @@ const DashboardTable: React.FC = () => {
                     dataSource={data}
                     pagination={tableParams.pagination}
                     onChange={handleTableChange}
+                    scroll={
+                        {
+                            scrollToFirstRowOnChange: true
+                        }
+                    }
                 />
             )}
         </>

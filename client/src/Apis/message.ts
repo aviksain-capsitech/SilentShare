@@ -7,7 +7,7 @@ export const sendMessageApi = async ({username,content}:{username:string;content
         return res.data;
     } catch (error: any) {
         console.log("Send Messages Api Error :: ", error);
-        return error?.response?.data
+        return error?.response?.data;
     }
 }
 
@@ -23,10 +23,11 @@ export const deleteMessageApi = async (id:{id:string}) => {
 }
 
 
-export const getMessagesApi = async () => {
+export const getMessagesApi = async ({queryParams}: {queryParams: URLSearchParams}) => {
     try {
-        const res = await axiosInstance.get('/message/get-all');
-        if(res) return res.data;
+        const res = await axiosInstance.get(`/message/get-all?${queryParams.toString()}`);
+        // console.log("Get Message Api :: ", res.data)
+        if(res) return res?.data?.data;
     } catch (error) {
         console.log("Get Messages Api Error :: ", error);
     }

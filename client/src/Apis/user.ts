@@ -13,7 +13,7 @@ export const SignUpApi = async (values: SignUpType) => {
 export const LoginApi = async (values: LoginType) => {
     try {
         const res = await axiosInstance.post("/user/login", values);
-        if (res) return res.data;
+        if (res) return res?.data;
     } catch (error) {
         console.log("Login Api Error :: ", error);
     }
