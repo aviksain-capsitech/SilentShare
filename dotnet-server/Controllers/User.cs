@@ -48,7 +48,7 @@ public class UserController : ControllerBase
                 string.IsNullOrWhiteSpace(userInput.Username) ||
                 string.IsNullOrWhiteSpace(userInput.Password))
             {
-                return BadRequest("Email, Full Name, and Password are required.");
+                return BadRequest(new { Success = false, Message = "Email, Full Name, and Password are required." });
             }
 
             var existingByEmail = await _userService.GetByEmailAsync(userInput.Email);
@@ -59,7 +59,7 @@ public class UserController : ControllerBase
                 return BadRequest(new { Success = false, Message = "Email already in use" });
 
             if (existingUsername != null)
-                return BadRequest("Username already in use");
+                return BadRequest(new { Success = false, Message = "Username already in use" });
 
             userInput.Email = userInput.Email.Trim().ToLower();
             userInput.Username = userInput.Username.Trim().ToLower();
@@ -85,14 +85,14 @@ public class UserController : ControllerBase
             if (string.IsNullOrWhiteSpace(userInput.Email) ||
                 string.IsNullOrWhiteSpace(userInput.Password))
             {
-                return BadRequest("Email and Password are required.");
+                return BadRequest(new { success = false, Message = "Email and Password are required." });
             }
 
             var existingUser = await _userService.GetByEmailAsync(userInput.Email);
 
             if (existingUser == null || !VerifyPassword(userInput.Password, existingUser.Password))
             {
-                return Unauthorized("Invalid credentials");
+                return BadRequest(new { success = false, Message = "Invalid credentials" });
             }
 
             var token = _jwtHelper.GenerateJwtToken(existingUser);
@@ -164,5 +164,5 @@ public class UserController : ControllerBase
 
         return Ok(new { Success = true, Message = "Message Toggled Successfully" });
     }
-    
+
 }

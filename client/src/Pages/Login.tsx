@@ -1,121 +1,128 @@
-import { Form, Input, Button, Typography, Card, message } from 'antd';
-import { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router';
-import { LoginApi } from '../Apis/user';
-import { saveUserData as saveUserDataRedux } from '../Redux/Slices/authSlice';
-import { useDispatch } from 'react-redux';
+import { Form, Input, Button, Typography, Card, message } from "antd";
+import { NavLink, useNavigate } from "react-router";
+import { saveUserData as saveUserDataRedux } from "../Redux/Slices/authSlice";
+import { useDispatch } from "react-redux";
+import { useLoginMutation } from "../TanstackApiService/User";
 
 const { Title } = Typography;
 
 const Login = () => {
-
-  const [loading, setLoading] = useState<boolean>(false);
+  const { mutate: login, isPending } = useLoginMutation();
 
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
   const dispatch = useDispatch();
 
-
-
   const onFinish = (values: any) => {
-    try {
-      setLoading(true);
+    messageApi.open({
+      type: "loading",
+      content: "Do not Refresh the page",
+      duration: 3,
+    });
 
-      messageApi.open({
-        type: "loading",
-        content: "Do not Refresh the page",
-        duration: 3
-      });
-
-      setTimeout(async () => {
-        const res: any = await LoginApi(values);
-
-        if (res) {
+    setTimeout(async () => {
+      login(values, {
+        onSuccess: (res) => {
           form.resetFields();
-          dispatch(saveUserDataRedux(res.data));
+
+          dispatch(saveUserDataRedux(res?.data?.data));
+
           messageApi.open({
-            type: 'success',
-            content: res.message,
+            type: "success",
+            content: res?.data?.message,
             duration: 3,
           });
 
           setTimeout(() => {
             navigate("/dashboard");
-            form.resetFields();
           }, 3000);
-        }
-        setLoading(false);
-      }, 5000);
-    } 
-    catch (error: any) {
-      messageApi.open({
-        type: "error",
-        content: error.message,
-        duration: 3
+        },
+        onError: (err: any) => {
+          messageApi.open({
+            type: "error",
+            content: err?.response?.data.message,
+            duration: 3,
+          });
+        },
       });
-    }
+    }, 5000);
   };
 
   return (
     <>
       {contextHolder}
-      <div style={{
-        display: 'flex',
-        height: '100vh',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}>
-        <Card style={{ width: 350, padding: 24, backgroundColor: "transparent", border: "none" }}>
-          <Title level={3} style={{ textAlign: 'center' }}>Login</Title>
+      <div
+        style={{
+          display: "flex",
+          height: "100vh",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Card
+          style={{
+            width: 350,
+            padding: 24,
+            backgroundColor: "transparent",
+            border: "none",
+          }}
+        >
+          <Title level={3} style={{ textAlign: "center" }}>
+            Login
+          </Title>
           <Form
             form={form}
             name="login_form"
             initialValues={{ remember: true }}
             onFinish={onFinish}
             layout="vertical"
+            disabled={isPending}
           >
             <Form.Item
               name="email"
               label="Email"
-              rules={[{ required: true, message: 'Please enter your email!' }]}
-
+              rules={[{ required: true, message: "Please enter your email!" }]}
             >
-              <Input
-                placeholder="Email"
-                disabled={loading}
-              />
+              <Input placeholder="Email" />
             </Form.Item>
 
             <Form.Item
               name="password"
               label="Password"
-              rules={[{ required: true, message: 'Please enter your password!' }]}
+              rules={[
+                { required: true, message: "Please enter your password!" },
+              ]}
             >
-              <Input.Password
-                placeholder="Password"
-                disabled={loading}
-              />
+              <Input.Password placeholder="Password" />
             </Form.Item>
 
             <Form.Item>
-              <Button type="primary" htmlType="submit" block loading={loading}>
-                {loading ? "Loading" : "Login"}
+              <Button type="primary" htmlType="submit" block>
+                {isPending ? "Loading" : "Login"}
               </Button>
             </Form.Item>
 
-            <Form.Item style={{ textAlign: 'center' }}>
-              Don't have an account ? <NavLink style={loading ? { cursor: "not-allowed" } : { cursor: "pointer" }} to="/signup" onClick={(e) => {
-                if (loading) {
-                  e.preventDefault(); // Stop navigation
+            <Form.Item style={{ textAlign: "center" }}>
+              Don't have an account ?{" "}
+              <NavLink
+                style={
+                  isPending ? { cursor: "not-allowed" } : { cursor: "pointer" }
                 }
-              }}>Sign Up</NavLink>
+                to="/signup"
+                onClick={(e) => {
+                  if (isPending) {
+                    e.preventDefault(); // Stop navigation
+                  }
+                }}
+              >
+                Sign Up
+              </NavLink>
             </Form.Item>
           </Form>
         </Card>
       </div>
     </>
-
   );
 };
 

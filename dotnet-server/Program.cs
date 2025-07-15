@@ -14,6 +14,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddSingleton<UserService>();
 builder.Services.AddSingleton<MessageService>();
+builder.Services.AddSingleton<FeedbackService>();
 builder.Services.AddSingleton<JwtHelper>();
 
 var jwtSecret = builder.Configuration["Jwt:Secret"] ?? "your_super_secret_key_here"; // Reads the JWT secret from configuration or uses a fallback value.

@@ -1,7 +1,7 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-public class Form
+public class Feedback
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
@@ -10,11 +10,8 @@ public class Form
     [BsonElement("name")]
     public required string Name { get; set; }
 
-    [BsonElement("feedback")]
-    public required string Feedback { get; set; }
-
-    [BsonElement("gender")]
-    public required string Password { get; set; }
+    [BsonElement("content")]
+    public required string Content { get; set; }
 
     [BsonElement("issueDate")]
     public DateTime IssueDate { get; set; }
@@ -24,6 +21,12 @@ public class Form
 
     [BsonElement("feedbackType")]
     public required string FeedbackType { get; set; }
+
+    [BsonElement("appVersion")]
+    public required string AppVersion { get; set; }
+
+    [BsonElement("screenShot")]
+    public required string ScreenShot { get; set; }
 
     [BsonElement("createdAt")]
     public DateTime CreatedAt { get; set; } = DateTime.Now; // take the current system time

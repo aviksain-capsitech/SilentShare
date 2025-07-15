@@ -1,8 +1,8 @@
 import { Button, Col, Flex, Layout, Popconfirm, Row } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
-import { LogoutApi } from '../Apis/user';
 import { deleteUserData } from '../Redux/Slices/authSlice';
+import { useLogoutMutation } from '../TanstackApiService/User';
 
 const { Header } = Layout;
 
@@ -12,6 +12,7 @@ function Navbar() {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const {mutate} = useLogoutMutation();
 
   return (
     <>
@@ -35,7 +36,8 @@ function Navbar() {
                       title="LogOut"
                       description="LogOut this Account ?"
                       onConfirm={async () => {
-                        await LogoutApi();
+                        
+                        mutate();
                         dispatch(deleteUserData());
                         navigate('/');
                       }}

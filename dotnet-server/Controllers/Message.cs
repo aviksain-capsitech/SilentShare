@@ -131,12 +131,10 @@ public class MessageController : ControllerBase
         }
 
         var userDetails = await _userService.GetByIdAsync(userId);
-        Console.Write("User Details: " + userDetails);
+        // Console.Write("User Details: " + userDetails);
 
         var result = await _messageService.GetAllByUsernameAsync(userDetails.Username, page, pageSize);
         return Ok(new { Success = true, Message = "Messages fetched Successfully", data = result });
     }
-
-    
 }
 

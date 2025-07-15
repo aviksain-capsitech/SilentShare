@@ -11,7 +11,6 @@ export const sendMessageApi = async ({username,content}:{username:string;content
     }
 }
 
-
 export const deleteMessageApi = async (id:{id:string}) => {
     try {
         var messageId = id;
@@ -21,7 +20,6 @@ export const deleteMessageApi = async (id:{id:string}) => {
         console.log("Delete Messages Api Error :: ",error);
     }
 }
-
 
 export const getMessagesApi = async ({queryParams}: {queryParams: URLSearchParams}) => {
     try {
